@@ -16,6 +16,33 @@ int GetNowMicros() {
 extern "C" int func(); 
 extern "C" int testmatMul();
 
+
+__global__ void rgb2graycuda(float* input, float* output, int width, int height) { 
+
+    int width_idx = blockDim.x * blockIdx.x + threadIdx.x;
+    int height_idx = blockDim.y * blockIdx.y + threadIdx.y;
+    if ((height_idx < height) && (width_idx < width)) {
+        float r = *(input + height_idx * width * 3 + width_idx * 3);
+        float g = *(input + height_idx * width * 3 + width_idx * 3 + 1);
+        float b = *(input + height_idx * width * 3 + width_idx * 3 + 2);
+        *(output + height_idx * width + width_idx) = 0.299f * r + 0.587f * b + 0.114f * b;
+    }
+
+
+}
+
+void rgb2graycpu(float *input, float *output, int width, int height) {
+    for (int h = 0; h < height; h++) {
+        for (int w = 0; w < width; w++) {
+            float r = *(input + h * width * 3 + w * 3);
+            float g = *(input + h * width * 3 + w * 3 + 1);
+            float b = *(input + h * width * 3 + w * 3 + 2);
+            *(output + h * width + w) = 0.299f *r + 0.587f *b + 0.114f *b;
+        }
+    }
+
+}
+
 struct Matrix
 {
     int width;
